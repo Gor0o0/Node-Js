@@ -1,6 +1,7 @@
 // -=-=-=-= Инициализация =-=-=-=-
 const readline = require('readline');    //> Аналог импорта
 const helper = require("./utils/helper");    //> Для персональных библиотек нужно указывать путь
+const fileManager = require("./utils/fileManager")
 const ConsoleDecorator = require("./utils/decorator");  //> с большой буквы чтоб отметить для себя что это класс    
 
 
@@ -14,7 +15,7 @@ let welcome = `Hello it's |${PROJ_NAME}|`;    // let изменяемая
 
 //! console.log(welcome)   //> Аналог принта
 
-let notes = [];
+let notes = fileManager.loadData();
 
 // -=-=-=-= Функционал =-=-=-=-
 
@@ -22,6 +23,22 @@ const welcomeApp = () => {
     ConsoleDecorator.drawLine(50, 3);
     console.log(`Приветствуем в приложе ${PROJ_NAME}`)
     showMenu();
+};
+
+const goodbye = () => {    
+    rl.question("We gonna cry if you leave | are you sure? (y/n): ",(choice) => {
+        switch(choice){
+            case 'y':
+                rl.close();      //> "закрытие вопроса"
+                break;
+            case 'n':
+                showNotes();
+                break;
+            default:
+                showMenu();
+                break;
+        }
+    })   
 };
 
 const addNode = () => {     //> Аналог fun для бэкэнда, function так же существует но не оч подходит | в fun кстати в конце не обязательно ставить ; т.к. это уже замкнутый участок кода
@@ -37,11 +54,12 @@ const addNode = () => {     //> Аналог fun для бэкэнда, function
             }
 
             notes.push(newNote) //> push как в git - сохранить
+            fileManager.saveData(notes)
             console.log(`Всего заметок ${notes.length}`);
             showMenu();
         })
     })   
-}; 
+};
 
 const showNotes = () => {
     if(notes.length === 0){
@@ -67,7 +85,7 @@ const showMenu = () => {    //> "=>" подобие лямбды
                 deleteNote();
                 break;
             case '0':
-                rl.close();      //> "закрытие вопроса"
+                goodbye();
                 break;
             default:
                 showMenu();
@@ -95,6 +113,7 @@ const deleteNote = () => {
         else if(num > 0 && num <= notes.length){     // && - и
             let del = notes.splice(num, -1)
             notes = helper.reindexIds(notes);
+            fileManager.saveData(notes);
             console.log(`Note ${num} is deleted`)
         }
         else{
