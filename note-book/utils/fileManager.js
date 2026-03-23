@@ -1,4 +1,4 @@
-const fs = require("fs"); // Модуль сохранения
+const fs = require("fs"); // Модуль сохранения | fs (fileSystem) - аналог библиотеки OC
 const path = 'note.json'
 
 const saveData = (notes) => {
