@@ -50,15 +50,29 @@ const server = http.createServer(async (req, res) => {
                 date: helper.formatDate()
             };
             notes.push(newNote) //> push как в git - сохранить
-            fileManager.saveData(notes)
+            await fileManager.saveData(notes)
             res.writeHead(200, { 'Content-Type': "application/json" });
             res.end(JSON.stringify({ success: true }));
             return;
         });
-        alert(`Note `) ///////////
-      
     }
 
+    if (url.startsWith("/api/notes/") && method === 'DELETE'){
+        const id = parseInt(url.split('/')[3])    //> split - для разделения | [3] значит что мы ожидамое третий смвол типо "/api/notes/3"
+
+        if(id > 0 && id <= notes.length){
+            notes.splice(id - 1, 1);
+            notes = helper.reindexIds(notes)
+            await fileManager.saveData(notes)
+
+            res.writeHead(200, {"Content-Type" : "application/json"});
+            res.end(JSON.stringify({success : true}));
+        }else{
+            res.writeHead(404);
+            res.end(JSON.stringify({success : false}));
+        }
+        return;
+    }
     return;
 });
 

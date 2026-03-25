@@ -34,6 +34,7 @@ async function addNote(){
     }catch(error){
         console.log("ERROR", error.message)
     }
+    await showNotes();
 }
 
 async function showNotes() {
@@ -56,6 +57,38 @@ async function showNotes() {
     });
 
     contents.innerHTML = html;
+}
+
+async function delNotes(){
+    await loadNotes()
+
+    if(notes.length === 0){
+        alert("No nones for now! create note for first")
+        return;
+    }
+
+    let list = '';
+    for (const note of notes){  //> Можно так же использовать notes.forEach / а так же map но тут сложнее
+        list += `${note.id}: ${note.title}\n`;
+    }
+    list = list.trim();
+
+    const input = prompt(`Enter note number to delete: \n\n${list}`)
+
+    const id = parseInt(input);
+
+    if(isNaN(id)){
+        alert("Need enter number!");
+        return;
+    
+    }
+    const res = await fetch(`api/notes/${id}`, {method : 'DELETE'});
+    
+    if(res.ok){
+        await showNotes();
+    }else{
+        alert("Error")
+    }
 }
 
 loadNotes();
